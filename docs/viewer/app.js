@@ -198,24 +198,25 @@ async function openDocument(file) {
   refs.preview.innerHTML = `<p class="muted">Loading ${file.title}...</p>`;
 
   try {
-    // MkDocs serves rendered HTML pages, not raw .md files
-    // Remove the .md extension to get the HTML page URL
-    const htmlPath = file.path.replace(/\.md$/, '/');
-    const res = await fetch(`../${htmlPath}`);
+    // Fetch the markdown file directly from the docs directory
+    const res = await fetch(`../${file.path}`);
     if (!res.ok) throw new Error("Failed to load file");
-    const html = await res.text();
+    const markdown = await res.text();
 
-    // Extract just the article content from the MkDocs page
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const article = doc.querySelector('article.md-content__inner') || doc.querySelector('article');
+    // Simple markdown to HTML conversion
+    let html = markdown
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+      .replace(/\*(.*)\*/gim, '<em>$1</em>')
+      .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' />")
+      .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>")
+      .replace(/\n$/gim, '<br />')
+      .replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
+      .replace(/`([^`]+)`/gim, '<code>$1</code>');
 
-    if (article) {
-      refs.preview.innerHTML = article.innerHTML;
-    } else {
-      // Fallback: show the whole body if we can't find the article
-      refs.preview.innerHTML = html;
-    }
+    refs.preview.innerHTML = `<div class="markdown-content">${html}</div>`;
   } catch (err) {
     refs.preview.innerHTML = `<p class="muted">Error: ${err.message}</p>`;
   }
