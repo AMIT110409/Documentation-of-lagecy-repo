@@ -30,42 +30,8 @@
     transition: all 0.3s ease;
 }
 
-.md-button:hover {
-    background-color: var(--upd-accent-purple);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(107, 76, 154, 0.3);
-}
-
-.md-button--primary {
-    background-color: var(--upd-accent-purple);
-    color: var(--upd-text-light);
-    overflow-wrap: break-word;
-    word-break: break-word;
-    max-width: 100%;
-}
-
-/* Fix for long words and URLs */
-.md-typeset {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.md-typeset code,
-.md-typeset pre {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    max-width: 100%;
-    overflow-x: auto;
-}
-
-/* Navigation styling */
-.md-nav__link--active {
-    color: var(--upd-accent-purple);
-    font-weight: 600;
-    background-color: rgba(107, 76, 154, 0.1);
-    border-left: 3px solid var(--upd-accent-purple);
-    padding-left: 0.8rem;
+border-left: 3px solid var(--upd-accent-purple);
+padding-left: 0.8rem;
 }
 
 .md-nav__link:hover {
