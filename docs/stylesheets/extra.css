@@ -93,6 +93,9 @@ a:hover {
 .md-nav__link--active {
     color: var(--upd-accent-purple);
     font-weight: 600;
+    background-color: rgba(107, 76, 154, 0.1);
+    border-left: 3px solid var(--upd-accent-purple);
+    padding-left: 0.8rem;
 }
 
 .md-nav__link:hover {
@@ -158,4 +161,47 @@ a:hover {
 .md-nav__title {
     color: var(--upd-accent-purple);
     font-weight: 600;
+}
+
+/* Keep sidebar always visible on desktop */
+@media screen and (min-width: 76.25em) {
+    .md-sidebar--primary {
+        display: block !important;
+    }
+}
+
+/* Ensure sidebar is scrollable */
+.md-sidebar__scrollwrap {
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+}
+
+/* Sticky navigation tabs */
+.md-tabs {
+    background-color: var(--upd-primary-dark);
+}
+
+.md-tabs__link {
+    color: var(--upd-text-light);
+    opacity: 0.8;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+    color: var(--upd-text-light);
+    opacity: 1;
+}
+
+/* Improve table of contents in sidebar */
+.md-nav--secondary {
+    border-left: 2px solid var(--upd-accent-purple);
+    padding-left: 0.5rem;
+}
+
+/* Mobile: Ensure drawer can be opened */
+@media screen and (max-width: 76.1875em) {
+    .md-nav--primary .md-nav__title {
+        background-color: var(--upd-primary-dark);
+        color: var(--upd-text-light);
+    }
 }
