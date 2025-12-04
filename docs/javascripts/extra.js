@@ -53,6 +53,197 @@ document.addEventListener('DOMContentLoaded', function () {
     // Run on page load
     makeCollapsible();
 
+    // Add search and filter functionality on SUMMARY page
+    const addSearchAndFilters = () => {
+        const content = document.querySelector('.md-content');
+        if (!content) return;
+
+        // Create filter container
+        const filterContainer = document.createElement('div');
+        filterContainer.style.cssText = `
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    `;
+
+        // Create search box
+        const searchBox = document.createElement('input');
+        searchBox.type = 'text';
+        searchBox.placeholder = 'Search documentation...';
+        searchBox.style.cssText = `
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-family: 'Poppins', Arial, sans-serif;
+      font-size: 0.95rem;
+    `;
+
+        // Create filter row
+        const filterRow = document.createElement('div');
+        filterRow.style.cssText = `
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    `;
+
+        // Category filter
+        const categoryLabel = document.createElement('label');
+        categoryLabel.textContent = 'Category:';
+        categoryLabel.style.cssText = `
+      font-weight: 500;
+      color: #3C3228;
+    `;
+
+        const categorySelect = document.createElement('select');
+        categorySelect.style.cssText = `
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: white;
+    `;
+
+        const categories = ['All Categories', 'Controllers', 'Services', 'Entities', 'Repositories', 'Commands', 'Events', 'Plugins', 'Other'];
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat === 'All Categories' ? '' : cat;
+            option.textContent = cat;
+            categorySelect.appendChild(option);
+        });
+
+        // Repository filter
+        const repoLabel = document.createElement('label');
+        repoLabel.textContent = 'Repository:';
+        repoLabel.style.cssText = `
+      font-weight: 500;
+      color: #3C3228;
+      margin-left: 1rem;
+    `;
+
+        const repoSelect = document.createElement('select');
+        repoSelect.style.cssText = `
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: white;
+    `;
+
+        const repos = ['All Repositories', 'Backend', 'Frontend', 'CMS'];
+        repos.forEach(repo => {
+            const option = document.createElement('option');
+            option.value = repo === 'All Repositories' ? '' : repo.toLowerCase();
+            option.textContent = repo;
+            repoSelect.appendChild(option);
+        });
+
+        // Clear filters button
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Filters';
+        clearButton.style.cssText = `
+      padding: 0.5rem 1rem;
+      background-color: #3C3228;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Poppins', Arial, sans-serif;
+      margin-left: auto;
+    `;
+
+        clearButton.onclick = () => {
+            searchBox.value = '';
+            categorySelect.value = '';
+            repoSelect.value = '';
+            filterContent();
+        };
+
+        // Assemble filter row
+        filterRow.appendChild(categoryLabel);
+        filterRow.appendChild(categorySelect);
+        filterRow.appendChild(repoLabel);
+        filterRow.appendChild(repoSelect);
+        filterRow.appendChild(clearButton);
+
+        // Assemble filter container
+        filterContainer.appendChild(searchBox);
+        filterContainer.appendChild(filterRow);
+
+        // Filter function
+        const filterContent = () => {
+            const searchTerm = searchBox.value.toLowerCase();
+            const selectedCategory = categorySelect.value.toLowerCase();
+            const selectedRepo = repoSelect.value.toLowerCase();
+
+            // Get all h2 sections (Controllers, Services, etc.)
+            const sections = content.querySelectorAll('h2');
+
+            sections.forEach(section => {
+                const sectionTitle = section.textContent.toLowerCase();
+                const sectionContent = section.nextElementSibling;
+
+                // Check if section matches category filter
+                const categoryMatch = !selectedCategory || sectionTitle.includes(selectedCategory);
+
+                if (sectionContent && sectionContent.tagName === 'UL') {
+                    let hasVisibleItems = false;
+
+                    // Filter list items
+                    const items = sectionContent.querySelectorAll('li');
+                    items.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        const link = item.querySelector('a');
+                        const linkHref = link ? link.getAttribute('href') : '';
+
+                        // Check search match
+                        const searchMatch = !searchTerm || text.includes(searchTerm);
+
+                        // Check repository match (based on file path patterns)
+                        let repoMatch = !selectedRepo;
+                        if (selectedRepo && linkHref) {
+                            if (selectedRepo === 'backend' && linkHref.includes('src_')) repoMatch = true;
+                            if (selectedRepo === 'frontend' && linkHref.includes('api_')) repoMatch = true;
+                            if (selectedRepo === 'cms' && linkHref.includes('cms_')) repoMatch = true;
+                        }
+
+                        // Show/hide item
+                        if (searchMatch && categoryMatch && repoMatch) {
+                            item.style.display = '';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Show/hide section
+                    if (hasVisibleItems && categoryMatch) {
+                        section.style.display = '';
+                        sectionContent.style.display = '';
+                    } else {
+                        section.style.display = 'none';
+                        sectionContent.style.display = 'none';
+                    }
+                }
+            });
+        };
+
+        // Add event listeners
+        searchBox.addEventListener('input', filterContent);
+        categorySelect.addEventListener('change', filterContent);
+        repoSelect.addEventListener('change', filterContent);
+
+        // Insert filter container
+        const firstHeading = content.querySelector('h1');
+        if (firstHeading && firstHeading.nextSibling) {
+            firstHeading.parentNode.insertBefore(filterContainer, firstHeading.nextSibling);
+        }
+    };
+
     // Add "Expand All" / "Collapse All" buttons
     const addExpandCollapseButtons = () => {
         const content = document.querySelector('.md-content');
@@ -93,11 +284,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         expandAll.addEventListener('click', () => {
             document.querySelectorAll('.md-content ul ul').forEach(ul => {
-                ul.style.display = 'block';
+                if (ul.style.display !== 'none') {
+                    ul.style.display = 'block';
+                }
             });
             document.querySelectorAll('.toc-toggle').forEach(toggle => {
-                toggle.style.transform = 'rotate(0deg)';
-                toggle.parentElement.classList.remove('collapsed');
+                if (toggle.parentElement.style.display !== 'none') {
+                    toggle.style.transform = 'rotate(0deg)';
+                    toggle.parentElement.classList.remove('collapsed');
+                }
             });
         });
 
@@ -114,14 +309,16 @@ document.addEventListener('DOMContentLoaded', function () {
         buttonContainer.appendChild(expandAll);
         buttonContainer.appendChild(collapseAll);
 
-        const firstHeading = content.querySelector('h1, h2');
-        if (firstHeading && firstHeading.nextSibling) {
-            firstHeading.parentNode.insertBefore(buttonContainer, firstHeading.nextSibling);
+        // Find filter container and insert after it
+        const filterContainer = content.querySelector('div');
+        if (filterContainer && filterContainer.nextSibling) {
+            filterContainer.parentNode.insertBefore(buttonContainer, filterContainer.nextSibling);
         }
     };
 
-    // Add buttons if on SUMMARY page
+    // Add features if on SUMMARY page
     if (window.location.pathname.includes('SUMMARY')) {
+        addSearchAndFilters();
         addExpandCollapseButtons();
     }
 
