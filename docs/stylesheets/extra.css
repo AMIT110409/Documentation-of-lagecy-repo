@@ -39,36 +39,6 @@
 .md-button--primary {
     background-color: var(--upd-accent-purple);
     color: var(--upd-text-light);
-}
-
-.md-button--primary:hover {
-    background-color: var(--upd-primary-dark);
-}
-
-/* Typography */
-body {
-    font-family: 'Poppins', Arial, sans-serif;
-}
-
-/* Header styling */
-.md-header {
-    background-color: var(--upd-primary-dark);
-}
-
-/* Link colors */
-a {
-    color: var(--upd-accent-purple);
-}
-
-a:hover {
-    color: var(--upd-primary-dark);
-}
-
-/* Card styling for content */
-.md-content__inner {
-    background-color: var(--upd-background);
-    /* Font overflow fixes */
-    word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
     max-width: 100%;
